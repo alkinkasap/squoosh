@@ -3,6 +3,7 @@ import { EncodeOptions as MozJPEGEncoderOptions } from './mozjpeg/encoder-meta';
 import { QuantizeOptions } from './imagequant/processor-meta';
 import { EncodeOptions as OptiPNGEncoderOptions } from './optipng/encoder-meta';
 import { EncodeOptions as WebPEncoderOptions } from './webp/encoder-meta';
+import { RotateFlipOptions } from './rotate-flip/processor-meta';
 
 async function mozjpegEncode(
   data: ImageData, options: MozJPEGEncoderOptions,
@@ -20,6 +21,15 @@ async function quantize(data: ImageData, opts: QuantizeOptions): Promise<ImageDa
     './imagequant/processor',
   );
   return process(data, opts);
+}
+
+async function rotateFlip(data: ImageData, options: RotateFlipOptions) {
+  const { rotateFlip } = await import(
+    /* webpackChunkName: "process-rotate-flip" */
+    './rotate-flip/processor',
+  );
+
+  return rotateFlip(data, options);
 }
 
 async function optiPngEncode(
@@ -50,7 +60,7 @@ async function webpDecode(data: ArrayBuffer): Promise<ImageData> {
   return decode(data);
 }
 
-const exports = { mozjpegEncode, quantize, optiPngEncode, webpEncode, webpDecode };
+const exports = { mozjpegEncode, quantize, rotateFlip, optiPngEncode, webpEncode, webpDecode };
 export type ProcessorWorkerApi = typeof exports;
 
 expose(exports, self);
